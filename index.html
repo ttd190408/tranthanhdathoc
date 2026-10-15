@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StudyFlow — Kế hoạch học tập cá nhân</title>
+<style>
+:root{--bg:#f5f7fb;--card:#fff;--ink:#172033;--muted:#6b7280;--primary:#635bff;--line:#e7eaf2;--green:#16a36a;--orange:#f59e0b}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,system-ui,-apple-system,Segoe UI,sans-serif}
+header{background:linear-gradient(120deg,#5148e5,#837bff);color:white;padding:25px max(22px,calc((100% - 1180px)/2));display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+.brand{font-size:22px;font-weight:800;letter-spacing:-.5px}.brand span{color:#d9d7ff}.header-sub{opacity:.9;font-size:13px}.date-pill{background:#ffffff24;border:1px solid #ffffff55;border-radius:30px;padding:8px 13px;font-size:13px}
+main{max-width:1180px;margin:26px auto;padding:0 20px}.welcome{display:flex;justify-content:space-between;align-items:end;gap:16px;flex-wrap:wrap;margin-bottom:20px}.welcome h1{font-size:27px;margin:0 0 4px;letter-spacing:-.7px}.welcome p{margin:0;color:var(--muted)}button{border:0;cursor:pointer;border-radius:10px;padding:10px 15px;font-weight:700;font-size:14px;transition:.15s}button:hover{transform:translateY(-1px)}.primary{background:var(--primary);color:white}.secondary{background:#eeedff;color:#5148e5}.danger{background:#fff0f0;color:#c24141}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin-bottom:18px}.stat,.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 4px 18px #1d2b4d05}.stat-label{color:var(--muted);font-size:13px}.stat-value{font-size:28px;font-weight:800;margin:6px 0 2px}.stat-note{font-size:12px;color:var(--green)}.layout{display:grid;grid-template-columns:1.4fr 1fr;gap:18px}.panel{margin-bottom:18px}.panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:15px}.panel h2{font-size:17px;margin:0}.muted{color:var(--muted);font-size:13px}.progress-track{height:8px;background:#eeeff5;border-radius:20px;overflow:hidden;margin:10px 0}.progress-fill{height:100%;background:linear-gradient(90deg,#635bff,#9c96ff);border-radius:20px;transition:width .2s}.task-list{display:flex;flex-direction:column;gap:10px}.task{display:flex;align-items:flex-start;gap:11px;border:1px solid var(--line);padding:12px;border-radius:12px}.task input{accent-color:var(--primary);width:17px;height:17px;margin-top:3px}.task-main{flex:1;min-width:0}.task-title{font-weight:700}.task.done .task-title{text-decoration:line-through;color:#9ca3af}.task-meta{font-size:12px;color:var(--muted);margin-top:3px}.tag{font-size:11px;border-radius:6px;padding:4px 7px;background:#f1f0ff;color:#5a51df;white-space:nowrap}.tag.high{background:#fff0e4;color:#b45309}.tag.low{background:#e8f8f0;color:#087f5b}.subject-row{margin:15px 0}.subject-top{display:flex;justify-content:space-between;font-size:13px;gap:12px}.subject-top strong{font-weight:700}.subject-bar{height:7px;background:#eef0f6;border-radius:20px;margin-top:7px;overflow:hidden}.subject-bar div{height:100%;border-radius:20px;background:var(--primary)}.empty{text-align:center;padding:24px;color:var(--muted);border:1px dashed var(--line);border-radius:12px}
+.modal-backdrop{display:none;position:fixed;inset:0;background:#11182780;z-index:5;align-items:center;justify-content:center;padding:18px}.modal-backdrop.open{display:flex}.modal{background:white;width:min(480px,100%);border-radius:18px;padding:22px;box-shadow:0 20px 80px #0003}.modal h2{margin:0 0 15px}.field{display:flex;flex-direction:column;gap:6px;margin-bottom:13px}.field label{font-size:13px;font-weight:700}.field input,.field select{width:100%;border:1px solid #dfe3ed;border-radius:9px;padding:10px;font:inherit;background:white}.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#172033;color:white;padding:11px 17px;border-radius:12px;display:none;z-index:10}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:12px 20px 30px}
+@media(max-width:800px){.stats{grid-template-columns:repeat(2,1fr)}.layout{grid-template-columns:1fr}.welcome h1{font-size:23px}}@media(max-width:420px){.stats{gap:9px}.stat{padding:13px}.stat-value{font-size:23px}.panel{padding:14px}}
+</style>
+</head>
+<body>
+<header><div><div class="brand">Study<span>Flow</span> ✦</div><div class="header-sub">Không gian quản lý kế hoạch học tập cá nhân</div></div><div class="date-pill" id="today"></div></header>
+<main>
+<section class="welcome"><div><h1>Xin chào, sinh viên! 👋</h1><p>Lập kế hoạch rõ ràng, học tập chủ động hơn mỗi ngày.</p></div><button class="primary" id="addBtn">＋ Thêm nhiệm vụ</button></section>
+<section class="stats">
+<div class="stat"><div class="stat-label">Nhiệm vụ hôm nay</div><div class="stat-value" id="todayCount">0</div><div class="stat-note">Việc cần tập trung</div></div>
+<div class="stat"><div class="stat-label">Đã hoàn thành</div><div class="stat-value" id="doneCount">0</div><div class="stat-note">Tiến bộ mỗi ngày</div></div>
+<div class="stat"><div class="stat-label">Tiến độ chung</div><div class="stat-value" id="percent">0%</div><div class="stat-note">Theo danh sách nhiệm vụ</div></div>
+<div class="stat"><div class="stat-label">Môn đang theo dõi</div><div class="stat-value" id="subjectCount">4</div><div class="stat-note">Mục tiêu học kỳ</div></div>
+</section>
+<div class="layout">
+<div>
+<section class="panel"><div class="panel-head"><h2>📚 Kế hoạch học tập</h2><span class="muted" id="taskSummary"></span></div><div class="progress-track"><div class="progress-fill" id="overallBar" style="width:0%"></div></div><div class="task-list" id="tasks"></div></section>
+<section class="panel"><div class="panel-head"><h2>🎯 Mục tiêu tuần này</h2><span class="muted">Tự theo dõi</span></div><div id="goals"></div><button class="secondary" id="goalBtn">＋ Thêm mục tiêu</button></section>
+</div>
+<div>
+<section class="panel"><div class="panel-head"><h2>📈 Tiến độ theo môn</h2><span class="muted">Học kỳ hiện tại</span></div><div id="subjects"></div></section>
+<section class="panel"><div class="panel-head"><h2>💡 Gợi ý học hiệu quả</h2></div><p><strong>Chia nhỏ nhiệm vụ</strong></p><p class="muted">Tách bài tập lớn thành các bước 25–45 phút để dễ bắt đầu và theo dõi.</p><p><strong>Ưu tiên việc quan trọng</strong></p><p class="muted">Làm trước nhiệm vụ có hạn nộp gần hoặc ảnh hưởng lớn đến kết quả học tập.</p><p><strong>Ôn tập chủ động</strong></p><p class="muted">Sau mỗi buổi học, dành 5–10 phút tự kiểm tra kiến thức thay vì chỉ đọc lại.</p></section>
+</div>
+</div>
+</main>
+<footer>StudyFlow · Dữ liệu được lưu trên trình duyệt của bạn · Hãy học đều đặn, không cần hoàn hảo.</footer>
+<div class="modal-backdrop" id="taskModal"><form class="modal" id="taskForm"><h2>Thêm nhiệm vụ học tập</h2><div class="field"><label for="taskName">Tên nhiệm vụ</label><input id="taskName" required placeholder="VD: Ôn tập chương 2 môn Toán"></div><div class="field"><label for="taskSubject">Môn học</label><input id="taskSubject" required placeholder="VD: Toán rời rạc"></div><div class="field"><label for="taskDate">Ngày thực hiện</label><input id="taskDate" type="date" required></div><div class="field"><label for="taskPriority">Mức độ ưu tiên</label><select id="taskPriority"><option value="Bình thường">Bình thường</option><option value="Cao">Cao</option><option value="Thấp">Thấp</option></select></div><div class="modal-actions"><button type="button" class="secondary" id="cancelBtn">Hủy</button><button class="primary" type="submit">Lưu nhiệm vụ</button></div></form></div>
+<div class="toast" id="toast"></div>
+<script>
+const todayISO=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
+const fmt=d=>new Date(d+'T00:00:00').toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric'});
+document.getElementById('today').textContent=new Date().toLocaleDateString('vi-VN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+let tasks=JSON.parse(localStorage.getItem('studyflow_tasks')||'null')||[
+{id:1,title:'Ôn tập Đại số tuyến tính',subject:'Toán học',date:todayISO(),priority:'Cao',done:false},
+{id:2,title:'Hoàn thành bài thực hành lập trình',subject:'Lập trình',date:todayISO(),priority:'Bình thường',done:false},
+{id:3,title:'Đọc tài liệu chương 3',subject:'Vật lý đại cương',date:todayISO(),priority:'Thấp',done:true},
+{id:4,title:'Làm bài tập tiếng Anh',subject:'Tiếng Anh',date:todayISO(),priority:'Bình thường',done:false},
+{id:5,title:'Xem lại ghi chú bài giảng',subject:'Lập trình',date:todayISO(),priority:'Bình thường',done:false}
+];
+let goals=JSON.parse(localStorage.getItem('studyflow_goals')||'null')||[
+{text:'Hoàn thành 3 buổi ôn tập',done:false},{text:'Nộp tất cả bài tập đúng hạn',done:false},{text:'Học tiếng Anh ít nhất 2 lần',done:true}
+];
+function save(){localStorage.setItem('studyflow_tasks',JSON.stringify(tasks));localStorage.setItem('studyflow_goals',JSON.stringify(goals))}
+function toast(msg){let t=document.getElementById('toast');t.textContent=msg;t.style.display='block';setTimeout(()=>t.style.display='none',2200)}
+function render(){
+const done=tasks.filter(t=>t.done).length,pct=tasks.length?Math.round(done/tasks.length*100):0;
+document.getElementById('todayCount').textContent=tasks.filter(t=>t.date===todayISO()&&!t.done).length;
+document.getElementById('doneCount').textContent=done;document.getElementById('percent').textContent=pct+'%';
+document.getElementById('overallBar').style.width=pct+'%';document.getElementById('taskSummary').textContent=`${done}/${tasks.length} hoàn thành`;
+const list=document.getElementById('tasks');list.innerHTML='';
+if(!tasks.length)list.innerHTML='<div class="empty">Chưa có nhiệm vụ. Hãy thêm kế hoạch đầu tiên của bạn!</div>';
+tasks.slice().sort((a,b)=>a.done-b.done||a.date.localeCompare(b.date)).forEach(t=>{
+const el=document.createElement('div');el.className='task'+(t.done?' done':'');
+const check=document.createElement('input');check.type='checkbox';check.checked=t.done;check.setAttribute('aria-label','Đánh dấu hoàn thành');check.onchange=()=>{t.done=check.checked;save();render()};
+const body=document.createElement('div');body.className='task-main';const title=document.createElement('div');title.className='task-title';title.textContent=t.title;
+const meta=document.createElement('div');meta.className='task-meta';meta.textContent=`${t.subject} · ${fmt(t.date)}`;
+body.append(title,meta);const tag=document.createElement('span');tag.className='tag '+(t.priority==='Cao'?'high':t.priority==='Thấp'?'low':'');tag.textContent=t.priority;
+const del=document.createElement('button');del.className='danger';del.textContent='×';del.title='Xóa nhiệm vụ';del.style.padding='2px 9px';del.onclick=()=>{if(confirm('Xóa nhiệm vụ này?')){tasks=tasks.filter(x=>x.id!==t.id);save();render();toast('Đã xóa nhiệm vụ')}};
+el.append(check,body,tag,del);list.appendChild(el)});
+const map={};tasks.forEach(t=>{if(!map[t.subject])map[t.subject]={total:0,done:0};map[t.subject].total++;if(t.done)map[t.subject].done++});
+const subjects=document.getElementById('subjects');subjects.innerHTML='';const entries=Object.entries(map);
+document.getElementById('subjectCount').textContent=entries.length;
+if(!entries.length)subjects.innerHTML='<div class="empty">Thêm nhiệm vụ để xem tiến độ theo môn.</div>';
+entries.forEach(([name,v])=>{const pct=Math.round(v.done/v.total*100);const row=document.createElement('div');row.className='subject-row';const top=document.createElement('div');top.className='subject-top';const strong=document.createElement('strong');strong.textContent=name;const label=document.createElement('span');label.textContent=`${pct}% · ${v.done}/${v.total}`;top.append(strong,label);const bar=document.createElement('div');bar.className='subject-bar';const fill=document.createElement('div');fill.style.width=pct+'%';bar.append(fill);row.append(top,bar);subjects.append(row)});
+const g=document.getElementById('goals');g.innerHTML='';goals.forEach((goal,i)=>{const row=document.createElement('div');row.className='task';row.style.marginBottom='9px';const c=document.createElement('input');c.type='checkbox';c.checked=goal.done;c.onchange=()=>{goal.done=c.checked;save();render()};const tx=document.createElement('div');tx.className='task-main';tx.textContent=goal.text;if(goal.done)tx.style.textDecoration='line-through';row.append(c,tx);g.append(row)});
+}
+const modal=document.getElementById('taskModal');document.getElementById('addBtn').onclick=()=>{document.getElementById('taskDate').value=todayISO();modal.classList.add('open')};document.getElementById('cancelBtn').onclick=()=>modal.classList.remove('open');
+document.getElementById('taskForm').onsubmit=e=>{e.preventDefault();tasks.push({id:Date.now(),title:document.getElementById('taskName').value.trim(),subject:document.getElementById('taskSubject').value.trim(),date:document.getElementById('taskDate').value,priority:document.getElementById('taskPriority').value,done:false});save();render();modal.classList.remove('open');e.target.reset();toast('Đã thêm nhiệm vụ mới')};
+document.getElementById('goalBtn').onclick=()=>{const text=prompt('Nhập mục tiêu học tập mới:');if(text&&text.trim()){goals.push({text:text.trim(),done:false});save();render();toast('Đã thêm mục tiêu')}};
+render();
+</script>
+</body>
+</html>
